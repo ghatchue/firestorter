@@ -90,7 +90,7 @@ const doc = new Document('albums/splinter');
 const ref = doc.ref;
 
 // Switch to another document
-doc.ref = firebase.firestore().doc('albums/americana');
+doc.ref = doc(getFirestore(), 'albums/americana');
 ```
 <a name="Document+id"></a>
 

@@ -17,7 +17,7 @@ const albums = new AggregateCollection('albums', {
   // can be recycled.
   queries: () => artistIds.map(artistId => ({
     key: `artist:${artistId}`,
-    query: ref => ref.where('artistId', '==', artistId)
+    query: ref => query(ref, where('artistId', '==', artistId))
   }))
 });
 

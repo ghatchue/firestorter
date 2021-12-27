@@ -169,7 +169,7 @@ class ListFilters extends Component {
 		chocolateBars.query = (ref) => {
 			filters.forEach(({type, key}) => {
 				FILTERS[type][key].forEach((where) => {
-					ref = ref.where(where[0], where[1], where[2]);
+					ref = query(ref, where(where[0], where[1], where[2]));
 				});
 			});
 			return ref;

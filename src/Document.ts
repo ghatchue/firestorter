@@ -1,4 +1,4 @@
-import type Firebase from 'firebase';
+import { DocumentReference, DocumentSnapshot, doc, SnapshotOptions, setDoc, deleteDoc, onSnapshot, getDoc, updateDoc } from 'firebase/firestore';
 import { observable, reaction, toJS, runInAction, IObservableValue } from 'mobx';
 
 import {
@@ -18,12 +18,9 @@ const isEqual = require('lodash.isequal');
 /**
  * @private
  */
-function resolveRef(
-  value: DocumentSource,
-  hasContext: IHasContext
-): Firebase.firestore.DocumentReference | undefined {
+function resolveRef(value: DocumentSource, hasContext: IHasContext): DocumentReference | undefined {
   if (typeof value === 'string') {
-    return getFirestore(hasContext).doc(value);
+    return doc(getFirestore(hasContext), value);
   } else if (typeof value === 'function') {
     return resolveRef(value(), hasContext);
   } else {
@@ -54,8 +51,8 @@ class Document<T extends object = object>
   private sourceInput: DocumentSource;
   private sourceDisposerFn: () => void;
   private refObservable: IObservableValue<any>;
-  private snapshotObservable: IObservableValue<Firebase.firestore.DocumentSnapshot | undefined>;
-  private snapshotOptions: Firebase.firestore.SnapshotOptions;
+  private snapshotObservable: IObservableValue<DocumentSnapshot | undefined>;
+  private snapshotOptions: SnapshotOptions;
   private docSchema: (data: object) => object;
   private isVerbose: boolean;
   private debugInstanceName?: string;
@@ -129,7 +126,7 @@ class Document<T extends object = object>
    */
   public get hasData(): boolean {
     const { snapshot } = this;
-    return !!snapshot && snapshot.exists;
+    return !!snapshot && snapshot.exists();
   }
 
   /**
@@ -150,12 +147,12 @@ class Document<T extends object = object>
    * const ref = doc.ref;
    *
    * // Switch to another document
-   * doc.ref = firebase.firestore().doc('albums/americana');
+   * doc.ref = doc(getFirestore(), 'albums/americana');
    */
-  public get ref(): Firebase.firestore.DocumentReference | undefined {
+  public get ref(): DocumentReference | undefined {
     return this.refObservable.get();
   }
-  public set ref(ref: Firebase.firestore.DocumentReference | undefined) {
+  public set ref(ref: DocumentReference | undefined) {
     this.source = ref;
   }
 
@@ -269,7 +266,7 @@ class Document<T extends object = object>
    *
    * @type {firestore.DocumentSnapshot}
    */
-  public get snapshot(): Firebase.firestore.DocumentSnapshot | undefined {
+  public get snapshot(): DocumentSnapshot | undefined {
     return this.snapshotObservable.get();
   }
 
@@ -306,7 +303,7 @@ class Document<T extends object = object>
         }
       }
     }
-    return ref.update(fields);
+    return updateDoc(ref, fields);
   }
 
   /**
@@ -340,7 +337,7 @@ class Document<T extends object = object>
         return Promise.reject(err);
       }
     }
-    return this.refObservable.get().set(data, options);
+    return setDoc(this.refObservable.get(), data, options);
   }
 
   /**
@@ -353,7 +350,7 @@ class Document<T extends object = object>
    * @return {Promise}
    */
   public delete(): Promise<void> {
-    return this.refObservable.get().delete();
+    return deleteDoc(this.refObservable.get());
   }
 
   /**
@@ -390,7 +387,7 @@ class Document<T extends object = object>
       this.isLoadingObservable.set(true);
     });
     try {
-      const snapshot = await ref.get();
+      const snapshot = await getDoc(ref);
       runInAction(() => {
         this.isLoadingObservable.set(false);
         this._updateFromSnapshot(snapshot);
@@ -549,14 +546,14 @@ class Document<T extends object = object>
   public releaseCollectionRef(): number {
     return --this.collectionRefCount;
   }
-  public updateFromCollectionSnapshot(snapshot: Firebase.firestore.DocumentSnapshot): void {
+  public updateFromCollectionSnapshot(snapshot: DocumentSnapshot): void {
     return this._updateFromSnapshot(snapshot);
   }
 
   /**
    * @private
    */
-  public _updateFromSnapshot(snapshot?: Firebase.firestore.DocumentSnapshot): void {
+  public _updateFromSnapshot(snapshot?: DocumentSnapshot): void {
     let data: any = snapshot ? snapshot.data(this.snapshotOptions) : undefined;
     if (data) {
       data = this._validateSchema(data);
@@ -590,7 +587,7 @@ class Document<T extends object = object>
   /**
    * @private
    */
-  protected _onSnapshot(snapshot: Firebase.firestore.DocumentSnapshot) {
+  protected _onSnapshot(snapshot: DocumentSnapshot) {
     runInAction(() => {
       if (this.isVerbose) {
         console.debug(`${this.debugName} - onSnapshot`);
@@ -647,10 +644,10 @@ class Document<T extends object = object>
       if (this.onSnapshotUnsubscribeFn) {
         this.onSnapshotUnsubscribeFn();
       }
-      this.onSnapshotUnsubscribeFn = this.refObservable.get().onSnapshot(
-        (snapshot) => this._onSnapshot(snapshot),
-        (err) => this._onSnapshotError(err)
-      );
+      this.onSnapshotUnsubscribeFn = onSnapshot(this.refObservable.get(), {
+        next: (snapshot) => this._onSnapshot(snapshot),
+        error: (err) => this._onSnapshotError(err),
+      });
     } else if (!newActive && active) {
       if (this.isVerbose) {
         console.debug(
@@ -676,8 +673,7 @@ class Document<T extends object = object>
     }
     if (typeof this.sourceInput === 'function') {
       this.sourceDisposerFn = reaction(
-        () =>
-          (this.sourceInput as () => Firebase.firestore.DocumentReference | string | undefined)(),
+        () => (this.sourceInput as () => DocumentReference | string | undefined)(),
         (value) => {
           runInAction(() => {
             // TODO, check whether path has changed

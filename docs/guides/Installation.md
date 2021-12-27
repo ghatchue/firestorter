@@ -17,12 +17,11 @@ To use Firestorter on the web, also install the [Firebase JavaScript SDK](https:
 After that, initialize Firebase and Firestorter:
 
 ```js
-import firebase from 'firebase';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
 import { initFirestorter } from 'firestorter';
 
 // Initialize firebase app
-firebase.initializeApp({
+initializeApp({
   "apiKey": "xxxxxxxxxxxxxxxxxxxxxxxxxxx",
 	"authDomain": "xxxxxxx.firebaseapp.com",
 	"databaseURL": "https://xxxxxxxx.firebaseio.com",
@@ -57,7 +56,7 @@ initFirestorter({ firebase: firebase });
 **react-native-firebase >= v6:**
 
 ```js
-import { firebase } from '@react-native-firebase/app';
+import { initializeApp } from '@react-native-firebase/app';
 import '@react-native-firebase/firestore';
 import { initFirestorter } from 'firestorter';
 
@@ -65,4 +64,4 @@ initFirestorter({ firebase: firebase });
 ```
 
 > [!NOTE]
-> There is no need to call `firebase.initializeApp(..)` as the initialisation is done natively in `react-native-firebase`.
+> There is no need to call `initializeApp(..)` as the initialisation is done natively in `react-native-firebase`.

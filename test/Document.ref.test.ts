@@ -1,4 +1,6 @@
-import { Document, firebase } from './init';
+import { doc } from 'firebase/firestore';
+
+import { Document, getFirestore } from './init';
 
 test('no ref', () => {
   const doc = new Document();
@@ -6,29 +8,29 @@ test('no ref', () => {
 });
 
 test('get ref', () => {
-  const ref = firebase.firestore().doc('todos/todo');
-  const doc = new Document(ref);
-  expect(doc.ref).toBe(ref);
+  const ref = doc(getFirestore(), 'todos/todo');
+  const d = new Document(ref);
+  expect(d.ref).toBe(ref);
 });
 
 test('set ref', () => {
-  const ref = firebase.firestore().doc('todos/todo');
-  const doc = new Document();
-  doc.ref = ref;
-  expect(doc.ref).toBe(ref);
+  const ref = doc(getFirestore(), 'todos/todo');
+  const d = new Document();
+  d.ref = ref;
+  expect(d.ref).toBe(ref);
 });
 
 test('clear ref', () => {
-  const ref = firebase.firestore().doc('todos/todo');
-  const doc = new Document(ref);
-  doc.ref = undefined;
-  expect(doc.ref).toBeUndefined();
+  const ref = doc(getFirestore(), 'todos/todo');
+  const d = new Document(ref);
+  d.ref = undefined;
+  expect(d.ref).toBeUndefined();
 });
 
 test('replace ref', () => {
-  const ref = firebase.firestore().doc('todos/todo');
-  const ref2 = firebase.firestore().doc('todos/todo2');
-  const doc = new Document(ref);
-  doc.ref = ref2;
-  expect(doc.ref).toBe(ref2);
+  const ref = doc(getFirestore(), 'todos/todo');
+  const ref2 = doc(getFirestore(), 'todos/todo2');
+  const d = new Document(ref);
+  d.ref = ref2;
+  expect(d.ref).toBe(ref2);
 });

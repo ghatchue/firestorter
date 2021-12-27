@@ -1,4 +1,4 @@
-import type Firebase from 'firebase';
+import { CollectionReference, Query } from 'firebase/firestore';
 import { runInAction, autorun, computed, makeObservable, IObservableArray } from 'mobx';
 
 import Collection from './Collection';
@@ -20,9 +20,7 @@ export type AggregateCollectionOrderBy<T> = (a: T, b: T) => number;
 export type AggregateCollectionFilterBy<T> = (doc: T) => boolean;
 export interface IAggregateCollectionQuery {
   key: string;
-  query: (
-    ref: Firebase.firestore.CollectionReference
-  ) => Firebase.firestore.Query | null | undefined;
+  query: (ref: CollectionReference) => Query | null | undefined;
 }
 export type AggregateCollectionQueries<Y> = Y[] | null;
 export type AggregateCollectionQueriesFn<

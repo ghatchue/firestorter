@@ -1,11 +1,9 @@
-import firebase from 'firebase';
-import 'firebase/firestore';
+import { deleteApp, initializeApp } from 'firebase/app';
 import { autorun, reaction, observable, configure } from 'mobx';
 
 import {
   initFirestorter,
   getFirestore,
-  getFirebase,
   getFirebaseApp,
   Collection,
   Document,
@@ -22,30 +20,26 @@ beforeAll(() => {
   jest.setTimeout(10000);
 
   // Initialize firebase
-  firebaseApp = firebase.initializeApp(firebaseConfig);
-  firebase.firestore();
+  firebaseApp = initializeApp(firebaseConfig);
 
   // Configure mobx strict-mode
   configure({ enforceActions: 'always', computedRequiresReaction: true });
 
   // Initialize firestorter
-  initFirestorter({ firebase, app: firebaseApp });
+  initFirestorter({ app: firebaseApp });
 
   // Verify that firestorter is initialized correctly
-  if (!getFirebase()) throw new Error('getFirebase');
   if (!getFirebaseApp()) throw new Error('getFirebaseApp');
   if (!getFirestore()) throw new Error('getFirestore');
 });
 
 afterAll(() => {
-  firebaseApp.delete();
+  deleteApp(firebaseApp);
 });
 
 export {
-  firebase,
   initFirestorter,
   getFirestore,
-  getFirebase,
   Collection,
   Document,
   isTimestamp,

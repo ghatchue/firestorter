@@ -56,7 +56,7 @@ await todo.update({
 // Properties can also be deleted entirely
 // See: https://firebase.google.com/docs/firestore/manage-data/delete-data
 await todo.update({
-  'settings.foo': getFirebase().firestore.FieldValue.delete()
+  'settings.foo': deleteField()
 });
 // Field-paths can be combined to update multiple
 // properties/objects at once

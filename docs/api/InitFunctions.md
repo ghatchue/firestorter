@@ -27,15 +27,14 @@ a context suitable for Document and Collection creation.</p></dd>
 
 **Example**  
 ```js
-import * as firebase from 'firebase/app';
-import 'firebase/firestore';
+import {initializeApp} from 'firebase/app';
 import {initFirestorter, Collection, Document} from 'firestorter';
 
 // Initialize firebase app
-firebase.initializeApp({...});
+initializeApp({...});
 
 // Initialize `firestorter`
-initFirestorter({firebase: firebase});
+initFirestorter();
 
 // Create collection or document
 const albums = new Collection('artists/Metallica/albums');

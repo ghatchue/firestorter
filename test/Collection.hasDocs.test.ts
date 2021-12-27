@@ -1,3 +1,5 @@
+import { query, where } from 'firebase/firestore';
+
 import { autorun, Collection, Mode } from './init';
 
 test('false when missing ref/path', async () => {
@@ -9,7 +11,7 @@ test('false when collection empty', async () => {
   expect.assertions(1);
   const col = new Collection('artists', {
     mode: Mode.On,
-    query: (ref) => ref.where('genre', '==', 'none'),
+    query: (ref) => query(ref, where('genre', '==', 'none')),
   });
   await col.ready();
   expect(col.hasDocs).toBeFalsy();
@@ -28,7 +30,7 @@ test('should not react when number of docs changes', async () => {
   expect.assertions(4);
   const col = new Collection('artists', {
     mode: Mode.On,
-    query: (ref) => ref.where('genre', '>', ''),
+    query: (ref) => query(ref, where('genre', '>', '')),
   });
   let reactionCount = 0;
   const dispose = autorun(() => {
@@ -40,10 +42,10 @@ test('should not react when number of docs changes', async () => {
   expect(reactionCount).toEqual(1);
   await col.ready();
   expect(reactionCount).toEqual(2);
-  col.query = (ref) => ref.where('genre', '>', 'r');
+  col.query = (ref) => query(ref, where('genre', '>', 'r'));
   await col.ready();
   expect(reactionCount).toEqual(2);
-  col.query = (ref) => ref.where('genre', '>', 'z');
+  col.query = (ref) => query(ref, where('genre', '>', 'z'));
   await col.ready();
   expect(reactionCount).toEqual(3);
   col.mode = Mode.Off;

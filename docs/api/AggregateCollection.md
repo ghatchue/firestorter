@@ -43,7 +43,7 @@ const userIds = ['pinky', 'brain'];
 const col = new AggregateCollection('todos', {
   queries: () => userIds.map(userId => ({
     key: userId, // unique-key by which the query is re-used/cached
-    query: (ref) => ref.where('userId', '==', userId).where('finished', '==', false)
+    query: (ref) => query(ref, where('userId', '==', userId), where('finished', '==', false))
   }))
 });
 ```

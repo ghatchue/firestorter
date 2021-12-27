@@ -1,4 +1,6 @@
-import { firebase, mergeUpdateData } from './init';
+import { deleteField } from 'firebase/firestore';
+
+import { mergeUpdateData } from './init';
 
 const TEST_DATA = {
   field1: 1,
@@ -74,7 +76,7 @@ test('append field path', () => {
 test('delete field', () => {
   expect(
     mergeUpdateData(TEST_DATA, {
-      field1: firebase.firestore.FieldValue.delete(),
+      field1: deleteField(),
     })
   ).toEqual({});
 });

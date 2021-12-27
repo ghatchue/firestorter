@@ -4,7 +4,7 @@
 	"private": true,
 	"homepage": ".",
 	"dependencies": {
-		"firebase": "^7.2.3",
+    "firebase": "^9.6.1",
 		"firestorter": "file:.yalc/firestorter",
 		"material-ui": "^0.19.4",
 		"mobx": "^5.13.0",

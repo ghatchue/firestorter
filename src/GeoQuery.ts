@@ -1,3 +1,4 @@
+import {query, where} from 'firebase/firestore';
 import { runInAction, observable, makeObservable, computed, IObservableValue } from 'mobx';
 
 import AggregateCollection, {
@@ -84,7 +85,8 @@ class GeoQuery<T extends ICollectionDocument> extends AggregateCollection<T, IGe
         return geohashes.map((geohash) => ({
           geohash,
           key: `${geohash[0]}-${geohash[1]}`,
-          query: (ref) => ref.where(fieldPath, '>=', geohash[0]).where(fieldPath, '<', geohash[1]),
+          query: (ref) =>
+            query(ref, where(fieldPath, '>=', geohash[0]), where(fieldPath, '<', geohash[1])),
         }));
       },
       ...otherOptions,

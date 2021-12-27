@@ -1,9 +1,8 @@
-import * as firebase from "firebase/app";
-import "firebase/firestore";
+import { initializeApp } from "firebase/app";
 import { initFirestorter, Collection, Document } from "firestorter";
 import { struct } from "superstruct";
 
-firebase.initializeApp({
+initializeApp({
 	apiKey: "AIzaSyBiY-6xQrji8oe5E90d1P8J8OvfIo3F6kE",
 	authDomain: "firestore-mobx-todo.firebaseapp.com",
 	databaseURL: "https://firestore-mobx-todo.firebaseio.com",
@@ -12,7 +11,7 @@ firebase.initializeApp({
 	messagingSenderId: "680642766706"
 });
 
-initFirestorter({ firebase: firebase });
+initFirestorter();
 
 class Todo extends Document {
 	constructor(source, options) {

@@ -1,29 +1,29 @@
 #!/usr/bin/env node
 
-const firebase = require('firebase');
+const { initializeApp, deleteApp } = require('firebase/app');
+const { collection, doc, getFirestore, deleteDoc } = require('firebase/firestore');
 
-require('firebase/firestore');
 const firebaseConfig = require('./firebaseConfig.json');
 const sampleData = require('./sampleData.json');
 
 // Initialize firestore
-const firebaseApp = firebase.initializeApp(firebaseConfig);
-const firestore = firebase.firestore();
+const firebaseApp = initializeApp(firebaseConfig);
+const firestore = getFirestore();
 
 const addDoc = (colId, docId, docData) => {
   const path = colId + '/' + docId;
   console.info('Setting: ' + path + ' -> ' + JSON.stringify(docData));
-  return firestore.doc(path).set(docData);
+  return doc(firestore, path).set(docData);
 };
 
 const deleteCol = async (colId, keepDocIds) => {
-  const snap = await firestore.collection(colId).get();
+  const snap = await collection(firestore, colId).get();
   await Promise.all(
     snap.docs
       .filter((d) => !keepDocIds.includes(d.id))
       .map(async (d) => {
         console.info('Deleting: ' + d.ref.path);
-        return d.ref.delete();
+        return deleteDoc(d.ref);
       })
   );
 };
@@ -45,7 +45,7 @@ Promise.all(
   .then(
     () => {
       console.info('DONE');
-      firebaseApp.delete();
+      deleteApp(firebaseApp);
       // process.exit(0);
     },
     (err) => {

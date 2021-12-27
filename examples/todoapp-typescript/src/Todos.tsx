@@ -6,6 +6,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import TodoItem from "./TodoItem";
+import { limit, query, where } from 'firebase/firestore';
 import "./todos.css";
 
 class Todos extends React.Component<any, any> {
@@ -68,7 +69,7 @@ class Todos extends React.Component<any, any> {
 		if (todos.query) {
 			todos.query = undefined;
 		} else {
-			todos.query = ref => ref.where("finished", "==", false).limit(10);
+			todos.query = ref => query(ref, where("finished", "==", false), limit(10));
 		}
 	};
 

@@ -2,8 +2,7 @@ import * as React from 'react';
 import GoogleMapReact from 'google-map-react';
 import { observer } from 'mobx-react';
 import './App.css';
-import firebase from 'firebase';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
 import {
   initFirestorter,
   GeoQuery,
@@ -15,7 +14,7 @@ import firebaseConfig from './firebaseConfig';
 import MapRect from './MapRect';
 import MapMarker from './MapMarker';
 
-firebase.initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 initFirestorter({ firebase });
 
 const initProps = {

@@ -69,7 +69,7 @@ import {Collection} from 'firestorter';
 const col = new Collection('artists/Metallica/albums');
 
 // Create a collection using a reference
-const col2 = new Collection(firebase.firestore().collection('todos'));
+const col2 = new Collection(collection(getFirestore(), 'todos'));
 
 // Create a collection and permanently start real-time updating
 const col2 = new Collection('artists', {
@@ -125,10 +125,10 @@ reference in more a readable way.</p>
 **Kind**: instance property of [<code>Collection</code>](#Collection)  
 **Example**  
 ```js
-const col = new Collection(firebase.firestore().collection('albums/splinter/tracks'));
+const col = new Collection(collection(getFirestore(), 'albums/splinter/tracks'));
 ...
 // Switch to another collection
-col.ref = firebase.firestore().collection('albums/americana/tracks');
+col.ref = collection(collection(getFirestore(), 'albums/americana/tracks');
 ```
 <a name="Collection+id"></a>
 
@@ -176,13 +176,13 @@ is an uncommon usage.</p>
 const todos = new Collection('todos');
 
 // Sort the collection
-todos.query = (ref) => ref.orderBy('text', 'asc');
+todos.query = (ref) => query(ref, orderBy('text', 'asc'));
 
 // Order, filter & limit
-todos.query = (ref) => ref.where('finished', '==', false).orderBy('finished', 'asc').limit(20);
+todos.query = (ref) => query(ref, where('finished', '==', false), orderBy('finished', 'asc'), limit(20));
 
 // React to changes in observable and force empty collection when required
-todos.query = (ref) => authStore.uid ? ref.where('owner', '==', authStore.uid) : null;
+todos.query = (ref) => authStore.uid ? query(ref, where('owner', '==', authStore.uid)) : null;
 
 // Clear the query, will cause whole collection to be fetched
 todos.query = undefined;

@@ -1,5 +1,8 @@
+import { deleteField } from 'firebase/firestore';
+
 import { Mode } from './Types';
-import { getFirebase, IHasContext } from './init';
+import { IHasContext } from './init';
+
 
 const isEqual = require('lodash.isequal');
 
@@ -11,11 +14,11 @@ const isEqual = require('lodash.isequal');
  * @param {Object} fields - JSON data that supports field-paths
  * @return {Object} Result
  */
-export function mergeUpdateData(data: object, fields: object, hasContext?: IHasContext) {
+export function mergeUpdateData(data: object, fields: object, _hasContext?: IHasContext) {
   const res = {
     ...data,
   };
-  const canonicalDelete = getFirebase(hasContext).firestore.FieldValue.delete();
+  const canonicalDelete = deleteField();
   for (const key in fields) {
     if (fields.hasOwnProperty(key)) {
       const val = fields[key];

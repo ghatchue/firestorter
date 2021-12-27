@@ -17,13 +17,7 @@ import {
 import GeoQuery from './GeoQuery';
 import { Mode } from './Types';
 import { mergeUpdateData, isTimestamp } from './Utils';
-import {
-  getFirebase,
-  getFirebaseApp,
-  getFirestore,
-  initFirestorter,
-  makeFirestorterContext,
-} from './init';
+import { getFirebaseApp, getFirestore, initFirestorter, makeFirestorterContext } from './init';
 
 export {
   Collection,
@@ -31,7 +25,6 @@ export {
   AggregateCollection,
   initFirestorter,
   getFirestore,
-  getFirebase,
   getFirebaseApp,
   mergeUpdateData,
   Mode,

@@ -9,12 +9,13 @@
 
 const fs = require('fs');
 const csvParse = require('csv-parse');
-const firebase = require('firebase');
+const { initializeApp, deleteApp } = require('firebase/app');
+const { doc, getFirestore, writeBatch } = require('firebase/firestore');
 const firebaseConfig = require('../../test/firebaseConfig.json');
 const { encodeGeohash } = require('../../lib/firestorter.js');
-require('firebase/firestore');
 
-const firebaseApp = firebase.initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
+const firestore = getFirestore();
 
 function loadCSV(filename) {
 	return new Promise((resolve, reject) => {
@@ -94,7 +95,7 @@ async function importCSVRows(rows) {
 	console.info(`Importing ${rows.length} rows...`);
 	console.time('import');
 	const count = rows.length;
-	const writeBatch = firebase.firestore().batch();
+	const batch = writeBatch(firestore);
 	for (let i = 0; i < count; i++) {
 		const row = rows[i];
 		const id = Number(row[2]);
@@ -109,17 +110,17 @@ async function importCSVRows(rows) {
 			rating: Number(row[6]),
 			beanType: row[7].trim(),
 			broadBeanOrigin: row[8].trim(),
-			location: new firebase.firestore.GeoPoint(latitude, longitude),
+			location: new GeoPoint(latitude, longitude),
 			geohash: encodeGeohash({
 				latitude,
 				longitude
 			})
 		};
 		// console.info('Adding ' + i + ' of ' + count + ': ' + row);
-		const ref = firebase.firestore().doc('chocolateBars/' + id);
-		writeBatch.set(ref, json);
+		const ref = doc(firestore, 'chocolateBars/' + id);
+		batch.set(ref, json);
 	}
-	await writeBatch.commit();
+	await batch.commit();
 	console.timeEnd('import');
 }
 
@@ -146,7 +147,7 @@ async function main() {
 	} catch (err) {
 		console.error(err.message);
 	}
-	await firebaseApp.delete();
+	await deleteApp(firebaseApp);
 	process.exit();
 }
 

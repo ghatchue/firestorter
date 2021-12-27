@@ -1,11 +1,11 @@
-import type Firebase from 'firebase';
+import { FirebaseApp, getApp } from 'firebase/app';
+import { deleteField, Firestore, getFirestore as getFirestoreInstance } from 'firebase/firestore';
 
 export const ModuleName = 'firestorter';
 
 export interface IContext {
-  readonly firebase: typeof Firebase;
-  readonly app: Firebase.app.App;
-  readonly firestore: Firebase.firestore.Firestore;
+  readonly app: FirebaseApp;
+  readonly firestore: Firestore;
 }
 
 export interface IHasContext {
@@ -13,9 +13,8 @@ export interface IHasContext {
 }
 
 export type FirestorterConfig = {
-  firebase: typeof Firebase;
-  app?: string | Firebase.app.App;
-  firestore?: Firebase.firestore.Firestore;
+  app?: string | FirebaseApp;
+  firestore?: Firestore;
 };
 
 let globalContext: IContext;
@@ -28,15 +27,14 @@ let globalContext: IContext;
  * @param {String|FirebaseApp} [config.app] - FirebaseApp to use (when omitted the default app is used)
  *
  * @example
- * import * as firebase from 'firebase/app';
- * import 'firebase/firestore';
+ * import {initializeApp} from 'firebase/app';
  * import {initFirestorter, Collection, Document} from 'firestorter';
  *
  * // Initialize firebase app
- * firebase.initializeApp({...});
+ * const firebaseApp = initializeApp({...});
  *
  * // Initialize `firestorter`
- * initFirestorter({firebase: firebase});
+ * initFirestorter({app: firebaseApp});
  *
  * // Create collection or document
  * const albums = new Collection('artists/Metallica/albums');
@@ -44,7 +42,7 @@ let globalContext: IContext;
  * const album = new Document('artists/Metallica/albums/BlackAlbum');
  * ...
  */
-function initFirestorter(config: FirestorterConfig): void {
+function initFirestorter(config?: FirestorterConfig): void {
   if (globalContext) {
     throw new Error(
       'Firestorter already initialized, did you accidentally call `initFirestorter()` again?'
@@ -89,41 +87,32 @@ function initFirestorter(config: FirestorterConfig): void {
  *   ...
  * })
  */
-export function makeFirestorterContext(config: FirestorterConfig): IContext {
-  // Set firebase object
-  if (!config.firebase) {
-    throw new Error('Missing argument `config.firebase`');
-  }
-  const globalFirebase = config.firebase;
-
+export function makeFirestorterContext(config?: FirestorterConfig): IContext {
   // Get app instance
-  const globalFirebaseApp = config.app
+  const firebaseApp = config?.app
     ? typeof config.app === 'string'
-      ? globalFirebase.app(config.app)
+      ? getApp(config.app)
       : config.app
-    : globalFirebase.app();
+    : getApp();
 
   // Get firestore instance
-  const globalFirestore = config.firestore || globalFirebaseApp.firestore();
-  if (!globalFirestore) {
+  const firestore = config?.firestore || getFirestoreInstance(firebaseApp);
+  if (!firestore) {
     throw new Error(
-      "firebase.firestore() returned `undefined`, did you forget `import 'firebase/firestore';` ?"
+      "getFirestore() returned `undefined`, did you forget `import 'firebase/firestore';` ?"
     );
   }
 
   // Verify existence of firestore & fieldvalue
   try {
-    globalFirebase.firestore.FieldValue.delete();
+    deleteField();
   } catch (err) {
-    throw new Error(
-      'Invalid `firebase` argument specified: `firebase.firestore.FieldValue.delete` does not exist'
-    );
+    throw new Error('Invalid `firebase` argument specified: `FieldValue.delete` does not exist');
   }
 
   return {
-    app: globalFirebaseApp,
-    firebase: globalFirebase,
-    firestore: globalFirestore,
+    app: firebaseApp,
+    firestore,
   };
 }
 
@@ -157,16 +146,12 @@ function contextWithProperty(key: keyof IContext, obj?: IHasContext) {
   }
 }
 
-function getFirebase(obj?: IHasContext): typeof Firebase {
-  return contextWithProperty('firebase', obj).firebase;
-}
-
-function getFirebaseApp(obj?: IHasContext): Firebase.app.App {
+function getFirebaseApp(obj?: IHasContext): FirebaseApp {
   return contextWithProperty('app', obj).app;
 }
 
-function getFirestore(obj?: IHasContext): Firebase.firestore.Firestore {
+function getFirestore(obj?: IHasContext): Firestore {
   return contextWithProperty('firestore', obj).firestore;
 }
 
-export { initFirestorter, getFirestore, getFirebase, getFirebaseApp };
+export { initFirestorter, getFirestore, getFirebaseApp };

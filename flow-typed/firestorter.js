@@ -1,15 +1,14 @@
 // @flow
-import { app, firestore } from 'firebase';
-import * as firebase from 'firebase';
+import { FirebaseApp } from 'firebase/app';
+import { Firestore } from 'firebase/firestore';
 
 ///////////////////////////////
 // Types.ts
 ///////////////////////////////
 
 export type IContext = {|
-	+firebase: typeof firebase,
-	+app: app.App,
-	+firestore: firestore.Firestore
+	+app: FirebaseApp,
+	+firestore: Firestore
 |};
 
 export interface IHasContext {
@@ -17,9 +16,8 @@ export interface IHasContext {
 }
 
 export type FirestorterConfig = {
-	firebase: typeof firebase;
-	app?: string | app.App;
-	firestore?: firestore.Firestore;
+	app?: string | FirestoreApp;
+	firestore?: Firestore;
 };
 
 export type DocumentSource =
@@ -80,19 +78,16 @@ export interface IEnhancedObservableDelegate {
 // Init.ts
 ///////////////////////////////
 
-declare export function initFirestorter(config: {
-	firebase: typeof firebase,
-	app?: string | app.App,
-	firestore?: firestore.Firestore
+declare export function initFirestorter(config?: {
+	app?: string | FirestoreApp,
+	firestore?: Firestore
 }): void;
-declare export function makeFirestorterContext(config: {
-	firebase: typeof firebase,
-	app?: string | app.App,
-	firestore?: firestore.Firestore
+declare export function makeFirestorterContext(config?: {
+	app?: string | FirestoreApp,
+	firestore?: Firestore
 }): IContext;
-declare export function getFirebase(obj?: IHasContext): typeof firebase;
-declare export function getFirebaseApp(obj?: IHasContext): app.App;
-declare export function getFirestore(obj?: IHasContext): firestore.Firestore;
+declare export function getFirebaseApp(obj?: IHasContext): FirestoreApp;
+declare export function getFirestore(obj?: IHasContext): Firestore;
 
 ///////////////////////////////
 // Document.ts

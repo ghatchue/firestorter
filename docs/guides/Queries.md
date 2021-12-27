@@ -8,7 +8,7 @@ To set a query on a Collection, create a function that returns a [Firestore Quer
 
 ```js
 const col = new Collection('todos', {
-  query: (ref) => ref.where('finished', '==', false).limit(10)
+  query: (ref) => query(ref, where('finished', '==', false), limit(10))
 });
 ```
 
@@ -18,7 +18,7 @@ Queries can also be set or re-set aftwards:
 const col = new Collection('todos');
 
 // Show only the documents that not finished, with a max-limit of 10
-col.query = (ref) => ref.where('finished', '==', false).limit(10);
+col.query = (ref) => query(ref, where('finished', '==', false), limit(10));
 
 // Reset query to show all data in the collection
 col.query = undefined;
@@ -62,7 +62,7 @@ to link queries to document-data. In the following example, the Collection query
 ```js
 const settingsDoc = new Document('settings');
 const col = new Collection('todos', {
-  query: (ref) => ref.where('finished', '==', settingsDoc.data.showFinished)
+  query: (ref) => query(ref, where('finished', '==', settingsDoc.data.showFinished))
 });
 autorun(() => {
   console.log(col.docs);

@@ -1,20 +1,22 @@
+import { doc } from 'firebase/firestore';
+
 import { Mode } from '../src/Types';
-import { Document, firebase } from './init';
+import { Document, getFirestore } from './init';
 
 test('no args', () => {
   expect(new Document()).toBeDefined();
 });
 
 test('invalid ref (empty)', () => {
-  expect(() => new Document(firebase.firestore().doc(''))).toThrow();
+  expect(() => new Document(doc(getFirestore(), ''))).toThrow();
 });
 
 test('invalid ref (collection path)', () => {
-  expect(() => new Document(firebase.firestore().doc('albums'))).toThrow();
+  expect(() => new Document(doc(getFirestore(), 'albums'))).toThrow();
 });
 
 test('valid ref', () => {
-  expect(new Document(firebase.firestore().doc('albums/gunsandroses'))).toBeDefined();
+  expect(new Document(doc(getFirestore(), 'albums/gunsandroses'))).toBeDefined();
 });
 
 test('invalid path (empty string)', () => {
@@ -41,10 +43,9 @@ test('all options', () => {
       mode: Mode.Auto,
       snapshot: {
         data: () => undefined,
-        exists: false,
+        exists: () => false,
         get: (_fieldPath: string) => undefined,
         id: '',
-        isEqual: () => false,
         metadata: undefined,
         ref: undefined,
       },
