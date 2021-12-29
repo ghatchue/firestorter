@@ -70,6 +70,7 @@ function runTypeScriptBuild(outDir, target, declarations) {
 }
 
 const rollupPlugins = [
+	require('rollup-plugin-peer-deps-external')(),
 	require('rollup-plugin-node-resolve')(),
 	require('rollup-plugin-filesize')()
 ];
@@ -80,8 +81,7 @@ function generateBundledModule(inputFile, outputFile, format, moduleName) {
 	return rollup
 		.rollup({
 			input: inputFile,
-			plugins: rollupPlugins,
-			external: ['mobx']
+			plugins: rollupPlugins
 		})
 		.then(bundle =>
 			bundle.write({
@@ -90,10 +90,7 @@ function generateBundledModule(inputFile, outputFile, format, moduleName) {
 				name: moduleName,
 				banner:
 					'/** Firestorter - (c) Hein Rutjes 2017 - 2019 - MIT Licensed */',
-				exports: 'named',
-				globals: {
-					mobx: 'mobx'
-				}
+				exports: 'named'
 			})
 		);
 }
