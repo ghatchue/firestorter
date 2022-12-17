@@ -1749,10 +1749,13 @@ var Document = /*#__PURE__*/function () {
 
       this.isLoadingObservable.set(true);
       (_this$onSnapshotUnsub = this.onSnapshotUnsubscribeFn) == null ? void 0 : _this$onSnapshotUnsub.call(this);
-      this.onSnapshotUnsubscribeFn = getContext(this).onSnapshot(this.refObservable.get(), function (snapshot) {
-        return _this7._onSnapshot(snapshot);
-      }, function (err) {
-        return _this7._onSnapshotError(err);
+      this.onSnapshotUnsubscribeFn = getContext(this).onSnapshot(this.refObservable.get(), {
+        next: function next(snapshot) {
+          return _this7._onSnapshot(snapshot);
+        },
+        error: function error(err) {
+          return _this7._onSnapshotError(err);
+        }
       });
     } else if (!newActive && active) {
       var _this$onSnapshotUnsub2;
@@ -2967,10 +2970,13 @@ var Collection = /*#__PURE__*/function () {
 
     this.isLoadingObservable.set(true);
     this.initialLocalSnapshotStartTime = Date.now();
-    this.onSnapshotUnsubscribe = getContext(this).onSnapshot(ref, function (snapshot) {
-      return _this8._onSnapshot(snapshot);
-    }, function (err) {
-      return _this8._onSnapshotError(err);
+    this.onSnapshotUnsubscribe = getContext(this).onSnapshot(ref, {
+      next: function next(snapshot) {
+        return _this8._onSnapshot(snapshot);
+      },
+      error: function error(err) {
+        return _this8._onSnapshotError(err);
+      }
     });
   };
 

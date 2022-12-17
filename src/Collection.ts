@@ -1005,8 +1005,10 @@ class Collection<T extends ICollectionDocument = Document>
     this.initialLocalSnapshotStartTime = Date.now();
     this.onSnapshotUnsubscribe = getContext(this).onSnapshot(
       ref,
-      (snapshot) => this._onSnapshot(snapshot),
-      (err) => this._onSnapshotError(err)
+      {
+        next: (snapshot) => this._onSnapshot(snapshot),
+        error: (err) => this._onSnapshotError(err),
+      },
     );
   }
 }

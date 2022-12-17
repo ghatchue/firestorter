@@ -651,8 +651,10 @@ class Document<T extends object = object>
       this.onSnapshotUnsubscribeFn?.();
       this.onSnapshotUnsubscribeFn = getContext(this).onSnapshot(
         this.refObservable.get(),
-        (snapshot) => this._onSnapshot(snapshot),
-        (err) => this._onSnapshotError(err)
+        {
+          next: (snapshot) => this._onSnapshot(snapshot),
+          error: (err) => this._onSnapshotError(err),
+        },
       );
     } else if (!newActive && active) {
       if (this.isVerbose) {
